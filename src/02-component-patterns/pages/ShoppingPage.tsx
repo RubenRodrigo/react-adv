@@ -1,13 +1,10 @@
 import { ProductCard, ProductButtons, ProductImage, ProductTitle } from "../components/";
 import { products } from "../data/products";
-import { useShoppingCard } from "../hooks/useShoppingCard";
 import '../styles/custom-styles.css';
 
-export const ShoppingPage = () => {
+const product = products[0]
 
-	// Tanto los valores del producto y el carrito son controlados con
-	// este state. Si cambia, cambiaran los valores de ambos.
-	const { shoppingCart, onProductCountChange } = useShoppingCard()
+export const ShoppingPage = () => {
 
 	return (
 		<div>
@@ -18,43 +15,31 @@ export const ShoppingPage = () => {
 				flexDirection: 'row',
 				flexWrap: 'wrap'
 			}}>
-				{
-					products.map(product => {
-						return (
-							<ProductCard
-								key={product.id}
-								product={product}
-								className="bg-dark text-white"
-								onChange={onProductCountChange}
-								value={shoppingCart[product.id]?.count || 0}
-							>
+				<ProductCard
+					product={product}
+					className="bg-dark text-white"
+					initialValues={{
+						count: 3,
+						maxCount: 10
+					}}
+				>
+					{
+						({ reset, count, maxCount, increaseBy, isMaxCountReached }) => (
+							<>
 								<ProductImage />
 								<ProductTitle />
-								<ProductButtons />
-							</ProductCard>
+								<ProductButtons className="custom-buttons" />
+								<button onClick={reset}>Reset</button>
+								<button onClick={() => increaseBy(-2)}>-2</button>
+								{/* Si no se llega al isMaxCount, ocultar */}
+								{
+									(!isMaxCountReached && <button onClick={() => increaseBy(+2)}>+2</button>)
+								}
+								<span>{count} - {maxCount}</span>
+							</>
 						)
-					})
-				}
-			</div>
-
-			<div className="shopping-cart">
-				{/* Basado en el carrito. Su estado depende del carrito */}
-				{
-					Object.entries(shoppingCart).map(([key, product]) => (
-						<ProductCard
-							key={key}
-							product={product}
-							className="bg-dark text-white"
-							style={{ width: '100px' }}
-							onChange={onProductCountChange}
-							value={product.count}
-						>
-							<ProductImage />
-							<ProductTitle />
-							<ProductButtons />
-						</ProductCard>
-					))
-				}
+					}
+				</ProductCard>
 			</div>
 		</div>
 	);
